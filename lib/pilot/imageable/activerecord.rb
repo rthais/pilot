@@ -11,7 +11,7 @@ module Pilot
           class_eval <<-GETTER, __FILE__, __LINE__ + 1
             def #{association_name}_with_filler
               #{association_name}_without_filler.presence || 
-              (@#{association_name}_filler ||= ImageFiller.fill(self, :#{association_name}))
+              (@#{association_name}_filler ||= ImageFiller.fill(self, :#{association_name}, #{use_filler}))
             end
             alias_method_chain :#{association_name}, :filler
           GETTER

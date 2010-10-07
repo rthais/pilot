@@ -34,10 +34,16 @@ module Pilot
         end
       end
   
-      def self.fill(imageable, name)
+      def self.fill(imageable, version_name, imageable_class = nil)
         load! unless self.loaded
-        filenames = filenames_from_association(imageable, name)
-        return nil unless filenames.present?
+        filler_class = if imageable_class.is_a? Class
+          imageable_class
+        else
+          imageable.class
+        end        
+        
+        filenames = filenames_from_association(filler_class, version_name)        
+        return nil unless filenames.present?        
         filename = pick(imageable, filenames)
         self.new filename
       end  
@@ -98,13 +104,13 @@ module Pilot
           "#{version.to_s}.#{filename}"
         end
         
-        def self.key_from_association(imageable_klass, name)
-          "#{imageable_klass.name.underscore}.#{name}"
+        def self.key_from_association(imageable_class, name)
+          "#{imageable_class.name.underscore}.#{name}"
         end
         
-        def self.filenames_from_association(imageable, name)
+        def self.filenames_from_association(imageable_class, name)
           filenames = nil
-          imageable.class.lookup_ancestors.each do |ancestor|
+          imageable_class.lookup_ancestors.each do |ancestor|
             filenames = self.map.find { |k,v| k == key_from_association(ancestor, name) }
             break unless filenames.blank?
           end
