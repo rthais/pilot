@@ -1,3 +1,5 @@
+# Borrowed from Carrierwave
+
 module Pilot
   module Imageable
     module Processor

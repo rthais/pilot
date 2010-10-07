@@ -1,4 +1,25 @@
-# Borrowed from CarrierWave
+# This file contains code take from CarrierWave
+#
+# Copyright (c) 2008 Jonas Nicklas
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+# 
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 require 'pathname'
 
@@ -13,9 +34,13 @@ module Pilot
   class SanitizedFile
     
     attr_accessor :file
+    
+    def self.ensure_sanitized(file)
+      return file if file.is_a? self.class
+      self.new file
+    end
 
     def initialize(file)
-      return file if file.is_a? self.class
       self.file = file      
       # Move a file to a location where its filename won't wreak havoc 
       # if called in a shell command (like mogrify)
@@ -202,6 +227,17 @@ module Pilot
       chmod!(new_path, permissions)
       self.class.new({:tempfile => new_path, :content_type => content_type})
     end
+    
+    
+    def clone(name)
+      tempfile = Tempfile.new(name).tap do |tmp|
+        tmp.class_eval { attr_accessor :original_filename }
+        tmp.original_filename = name
+        tmp.binmode
+        tmp.write self.read
+      end
+      self.class.new tempfile
+    end
 
     ##
     # Removes the file from the filesystem.
@@ -270,6 +306,5 @@ module Pilot
       end
       return filename, "" # In case we weren't able to split the extension
     end
-
-  end # SanitizedFile
-end # Pilot
+  end 
+end 

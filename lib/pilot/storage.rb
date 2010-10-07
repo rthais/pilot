@@ -1,7 +1,29 @@
-# Borrowed from CarrierWave
+require 'fog'
 
-module Pilot
-    
+# This file contains code take from CarrierWave
+#
+# Copyright (c) 2008 Jonas Nicklas
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+# 
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+module Pilot    
   class Storage
 
     def initialize(record)
@@ -40,7 +62,7 @@ module Pilot
     # Remove the file from Amazon S3
     #
     def delete
-      connection.delete_object(path, name)
+      self.class.connection.delete_object(path, name)
     end
 
     ##
@@ -66,13 +88,13 @@ module Pilot
         {
           'x-amz-acl' => access_policy,
           'Content-Type' => content_type
-        }.merge(Pilot.config.headers || {})
+        }.merge(Pilot.headers || {})
       )
     end
 
     # The Amazon S3 Access policy ready to send in storage request headers.
     def access_policy
-      Pilot.config.access_policy
+      Pilot.access_policy
     end
 
     def content_type
@@ -99,11 +121,9 @@ module Pilot
 
     def self.connection
       @connection ||= Fog::AWS::Storage.new(
-        :aws_access_key_id => Pilot.config[:key],
-        :aws_secret_access_key => Pilot.config[:secret]
+        :aws_access_key_id => Pilot.key,
+        :aws_secret_access_key => Pilot.secret
       )
     end
-
   end
-
 end
