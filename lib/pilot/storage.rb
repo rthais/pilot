@@ -1,6 +1,6 @@
 require 'fog'
 
-# This file contains code take from CarrierWave
+# This file contains code taken from CarrierWave
 #
 # Copyright (c) 2008 Jonas Nicklas
 # 
