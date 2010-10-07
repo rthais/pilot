@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Roberto Thais"]
   s.email       = ["roberto.n.thais@gmail.com"]
   s.homepage    = "http://rubygems.org/gems/pilot"
-  s.summary     = %q{Association powered file attachments}
-  s.description = %q{Coming soon!}
+  s.summary     = %q{Association powered file attachments for Rails 3}
+  s.description = %q{Association powered file attachments for Rails 3}
 
   s.rubyforge_project = "pilot"
   
