@@ -22,6 +22,10 @@ module Pilot
         storage.url
       end
       
+      def filler? 
+        true
+      end
+      
       def storage
         @storage ||= Storage.new(self)
       end
@@ -36,6 +40,7 @@ module Pilot
   
       def self.fill(imageable, version_name, imageable_class = nil)
         load! unless self.loaded
+        
         filler_class = if imageable_class.is_a? Class
           imageable_class
         else

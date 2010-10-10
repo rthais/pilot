@@ -28,7 +28,11 @@ module Pilot
             version_temp_file = _temp_file.clone(version_temp_filename)
             self.send "create_#{v.to_s}", :_temp_file => version_temp_file
           end
-        end              
+        end 
+        
+        def filler?
+          false
+        end                     
       end     
     end      
   end
