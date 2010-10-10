@@ -5,7 +5,7 @@ require 'pilot/railtie'
 
 module Pilot  
   
-  autoload :ActiveRecord, 'pilot/activerecord'
+  autoload :ActiveRecord, 'pilot/active_record'
   autoload :Imageable, 'pilot/imageable'
   autoload :Storage, 'pilot/storage'
   autoload :SanitizedFile, 'pilot/sanitized_file'
