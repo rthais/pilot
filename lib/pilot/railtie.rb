@@ -4,9 +4,11 @@ require 'rails'
 module Pilot    
   class Railtie < Rails::Railtie
     
-    initializer "pilot.extend_activerecord" do           
-      ::ActiveRecord::Base.extend Pilot::ActiveRecord
-      ::ActiveRecord::Base.extend Imageable::ActiveRecord
+    initializer "pilot.extend_activerecord" do  
+      ActiveSupport.on_load(:active_record) do          
+        self.extend Pilot::ActiveRecord
+        self.extend Imageable::ActiveRecord
+      end
     end
     
     config.after_initialize do
