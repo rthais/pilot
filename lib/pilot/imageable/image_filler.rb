@@ -21,23 +21,26 @@ module Pilot
       def url
         storage.url
       end
+      alias_method :to_s, :url
       
       def filler? 
         true
       end
-      
+      # HACK - otherwise preloading records fails. Investigate better solution.
+      alias_method :nil?, :filler?
+            
       def storage
         @storage ||= Storage.new(self)
       end
       
       def method_missing(method, *args, &blk)
-        if Pilot.image_versions_class.list.include? method
+        if Pilot.image_versions_class.list.include? method 
           self.class.new self.class.filename_from_version(self.s3_key, method)
         else
-          raise NoMethodError
+          super
         end
       end
-  
+        
       def self.fill(imageable, version_name, imageable_class = nil)
         load! unless self.loaded
         
