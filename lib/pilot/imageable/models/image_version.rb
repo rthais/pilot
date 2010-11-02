@@ -4,7 +4,8 @@ module Pilot
       
       def self.extended(base)
         base.send :include, Imageable::Processor
-        base.belongs_to :image, :class_name => Pilot.image_class_name 
+        base.belongs_to :image, :class_name => Pilot.image_class_name,
+         :foreign_key => Pilot.image_class_name.foreign_key
         base.before_upload :process
       end
 

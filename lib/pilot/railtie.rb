@@ -15,9 +15,6 @@ module Pilot
       if Pilot.image_class_name.present? && Pilot.image_versions_class_name.present?        
         Pilot.image_versions_class = Pilot.image_versions_class_name.constantize
         Pilot.image_class = Pilot.image_class_name.constantize
-        
-        Pilot.image_versions_class.extend Imageable::ImageVersion
-        Pilot.image_class.extend Imageable::Image
       end
       
     end      

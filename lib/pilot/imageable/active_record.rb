@@ -1,6 +1,17 @@
 module Pilot
   module Imageable
     module ActiveRecord      
+      
+      
+      def stores_images(*args)
+        stores args
+        extend Image
+      end
+        
+      def stores_image_versions(*args)
+        stores args
+        extend ImageVersion
+      end
 
       def has_one_image(association_name, options = {}, &extension)
         use_filler = options.delete :filler

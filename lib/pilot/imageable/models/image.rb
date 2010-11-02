@@ -12,7 +12,8 @@ module Pilot
         end
 
         base.has_many :versions, :dependent => :destroy, 
-          :class_name => Pilot.image_versions_class_name 
+          :class_name => Pilot.image_versions_class_name,
+          :foreign_key => base.name.foreign_key          
 
         base.belongs_to :imageable, :polymorphic => true
 
