@@ -25,66 +25,70 @@ require 'fog'
 
 module Pilot    
   class Storage
+    
+    attr_reader :path, :name, :file
+    attr_writer :headers, :content_type, :access_policy
 
-    def initialize(record)
-      @record = record
-    end
-
-    ##
-    # Returns the current bucket of the file on S3
-    #
-    # === Returns
-    #
-    # [String] A bucket
-    #
-    def path
-      @record.path
+    def initialize(path, name, file = nil)
+      file &&= SanitizedFile.ensure_sanitized(file) 
+      @path, @name, @file = path, name, file
     end
     
-    def name
-      @record.s3_key
+    def self.store!(*args)
+      obj = new(*args)
+      yield obj if block_given?
+      obj.store!
+    end
+    
+    def self.delete!(*args)
+      new(*args).delete!
+    end
+    
+    def self.url(*args)
+      new(*args).url
+    end
+    
+    def self.read(*args)
+      new(*args).read
+    end
+    
+    def self.connection
+      @connection ||= Fog::AWS::Storage.new(
+        :aws_access_key_id => Pilot.key,
+        :aws_secret_access_key => Pilot.secret
+      )
+    end
+    
+    def connection
+      self.class.connection
     end
 
-    ##
-    # Reads the contents of the file from S3
-    #
-    # === Returns
-    #
-    # [String] contents of the file
-    #
     def read
-      result = connection.get_object(path, name)
+      result = connection.get_object(@path, @name)
       @headers = result.headers
       result.body
     end
-
-    ##
-    # Remove the file from Amazon S3
-    #
-    def delete
-      self.class.connection.delete_object(path, name)
+    
+    def read_to_file
+      SanitizedFile.from_blob read
+    end
+    
+    def delete!
+      connection.delete_object(@path, @name)
     end
 
-    ##
-    # Returns the url on Amazon's S3 service
-    #
-    # === Returns
-    #
-    # [String] file's url
-    #
     def url(expires = nil)
       return nil unless name.present?
       if expires.present?
-        connection.get_object_url(path, name, expires.to_i)
+        connection.get_object_url(@path, @name, expires.to_i)
       else      
-        ["http://s3.amazonaws.com", path, name].compact.join('/')
+        ["http://s3.amazonaws.com", @path, @name].join('/')
       end
     end
     
-
     def store!
-      content_type ||= @record._temp_file.content_type # this might cause problems if content type changes between read and upload (unlikely)
-      self.class.connection.put_object(path, name, @record._temp_file.read,
+      self.content_type ||= @file.content_type # this might cause problems if content type changes between read and upload (unlikely)
+      connection.put_object(@path, @name, @file.read,
         {
           'x-amz-acl' => access_policy,
           'Content-Type' => content_type
@@ -94,15 +98,12 @@ module Pilot
 
     # The Amazon S3 Access policy ready to send in storage request headers.
     def access_policy
-      Pilot.access_policy
-    end
+      @access_policy || Pilot.access_policy
+    end   
+ 
 
     def content_type
-      headers["Content-Type"]
-    end
-
-    def content_type=(type)
-      headers["Content-Type"] = type
+      @content_type || headers["Content-Type"]
     end
 
     def size
@@ -112,18 +113,10 @@ module Pilot
     # Headers returned from file retrieval
     def headers
       @headers ||= begin
-        connection.head_object(path, name).headers
+        connection.head_object(@path, @name).headers
       rescue Excon::Errors::NotFound # Don't die, just return no headers
         {}
       end
-    end
-
-
-    def self.connection
-      @connection ||= Fog::AWS::Storage.new(
-        :aws_access_key_id => Pilot.key,
-        :aws_secret_access_key => Pilot.secret
-      )
     end
   end
 end

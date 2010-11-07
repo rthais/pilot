@@ -39,6 +39,23 @@ module Pilot
       return file if file.is_a? self.class
       self.new file
     end
+    
+    def self.from_blob(blob)
+      tempfile do |tmp|
+        tmp.write blob
+      end
+    end
+    
+    def self.tempfile(name = nil)
+      name ||= SecureRandom.hex(4)
+      temp = Tempfile.new(name).tap do |file|
+        file.class_eval { attr_accessor :original_filename }
+        file.original_filename = name
+        file.binmode
+        yield file if block_given?
+      end
+      self.new temp
+    end
 
     def initialize(file)
       self.file = file      
@@ -229,14 +246,10 @@ module Pilot
     end
     
     
-    def clone(name)
-      tempfile = Tempfile.new(name).tap do |tmp|
-        tmp.class_eval { attr_accessor :original_filename }
-        tmp.original_filename = name
-        tmp.binmode
-        tmp.write self.read
+    def clone
+      self.class.tempfile do |file|
+        file.write self.read
       end
-      self.class.new tempfile
     end
 
     ##

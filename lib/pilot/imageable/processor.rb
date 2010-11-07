@@ -20,15 +20,23 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 module Pilot
   module Imageable
-    module Processor
+    class Processor
+      
+      attr_accessor :file
+      
+      def self.process(file, &blk)
+        new(file).instance_exec &blk
+      end
+      
+      def initialize(file)
+        @file = file
+      end
             
       def resize_to_limit(width, height)
         manipulate! do |img|
           img.resize "#{width}x#{height}>"
-          img = yield(img) if block_given?
           img
         end
       end
@@ -46,7 +54,6 @@ module Pilot
             cmd.gravity gravity
             cmd.extent "#{width}x#{height}" if cols != width || rows != height
           end
-          img = yield(img) if block_given?
           img
         end
       end
@@ -54,18 +61,15 @@ module Pilot
       def convert(format)
         manipulate! do |img|
           img.format(format.to_s.downcase)
-          img = yield(img) if block_given?
           img
         end
       end
   
       def manipulate!
-        image = ::MiniMagick::Image.from_file(self._temp_file.path)
+        image = ::MiniMagick::Image.open(@file.path)
         image = yield(image)
-        image.write(self._temp_file.path)
-        # rescue ::MiniMagick::Error => e    
-      end
-      
+        image.write(@file.path)
+      end      
     end
   end
 end

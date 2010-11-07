@@ -9,14 +9,6 @@ module Pilot
         self.extend Pilot::ActiveRecord
         self.extend Imageable::ActiveRecord
       end
-    end
-    
-    config.after_initialize do
-      if Pilot.image_class_name.present? && Pilot.image_versions_class_name.present?        
-        Pilot.image_versions_class = Pilot.image_versions_class_name.constantize
-        Pilot.image_class = Pilot.image_class_name.constantize
-      end
-      
-    end      
+    end   
   end
 end
