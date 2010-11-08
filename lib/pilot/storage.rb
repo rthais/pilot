@@ -74,7 +74,9 @@ module Pilot
     end
     
     def delete!
-      connection.delete_object(@path, @name)
+      if Pilot.perform_deletions
+        connection.delete_object(@path, @name)
+      end
     end
 
     def url(expires = nil)

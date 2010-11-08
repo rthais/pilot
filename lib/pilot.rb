@@ -27,6 +27,9 @@ module Pilot
   
   mattr_accessor :image_fillers_path
   @@image_fillers_path = nil
+  
+  mattr_accessor :perform_deletions
+  @@perform_deletions = false
       
   def self.configure
     yield self
