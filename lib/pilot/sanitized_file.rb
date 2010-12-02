@@ -53,6 +53,7 @@ module Pilot
         file.original_filename = name
         file.binmode
         yield file if block_given?
+        file.rewind
       end
       self.new temp, true
     end
