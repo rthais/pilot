@@ -155,12 +155,12 @@ module Pilot
     #
     # [String] contents of the file
     #
-    def read(*args)
+    def read
       if is_path?
-        File.open(@file, "rb").read(*args)
+        File.open(@file, "rb").read
       else
         @file.rewind if @file.respond_to?(:rewind)
-        @file.read(*args)
+        @file.read
       end
     end
 
