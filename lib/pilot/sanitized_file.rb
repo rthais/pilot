@@ -271,12 +271,6 @@ module Pilot
       @file.content_type.chomp if @file.respond_to?(:content_type) and @file.content_type
     end
     
-    def close
-      unless is_path?
-        @file.close if @file.respond_to?(:close)
-      end
-    end
-    
 
   private
 
