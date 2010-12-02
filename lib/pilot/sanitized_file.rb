@@ -162,8 +162,9 @@ module Pilot
         File.open(@file, "rb").read
       else
         if args.blank? && @file.respond_to?(:rewind)
-          @file.read(*args)
+          @file.rewind
         end
+        @file.read(*args)
       end
     end
     
