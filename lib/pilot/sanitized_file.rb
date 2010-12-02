@@ -54,14 +54,16 @@ module Pilot
         file.binmode
         yield file if block_given?
       end
-      self.new temp
+      self.new temp, true
     end
 
-    def initialize(file)
+    def initialize(file, trusted_filename = false)
       self.file = file      
       # Move a file to a location where its filename won't wreak havoc 
       # if called in a shell command (like mogrify)
-      self.move_to File.join(File.dirname(path), filename)
+      unless trusted_filename
+        self.move_to File.join(File.dirname(path), filename)
+      end
     end
 
     # Returns the filename, sanitized to strip out any evil characters.
@@ -155,12 +157,19 @@ module Pilot
     #
     # [String] contents of the file
     #
-    def read
+    def read(*args)
       if is_path?
         File.open(@file, "rb").read
       else
-        @file.rewind if @file.respond_to?(:rewind)
-        @file.read
+        if args.blank? && @file.respond_to?(:rewind)
+          @file.read(*args)
+        end
+      end
+    end
+    
+    def close
+      unless is_path?
+        @file.close if @file.respond_to?(:close)
       end
     end
 
