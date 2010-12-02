@@ -159,7 +159,10 @@ module Pilot
       if is_path?
         File.open(@file, "rb").read(*args)
       else
-        @file.rewind if @file.respond_to?(:rewind)
+        # Rewind only if there are no args        
+        if args.present? && @file.respond_to?(:rewind)
+          @file.rewind 
+        end
         @file.read(*args)
       end
     end
