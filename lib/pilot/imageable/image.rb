@@ -32,8 +32,8 @@ module Pilot
           end
         end
         
-        def respond_to?(method)
-          return true if versions.keys.include? method
+        def respond_to?(*args)
+          return true if versions.keys.include? args[0]
           super
         end
            
