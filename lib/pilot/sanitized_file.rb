@@ -55,16 +55,11 @@ module Pilot
         yield file if block_given?
         file.rewind
       end
-      self.new temp, true
+      self.new temp
     end
 
-    def initialize(file, trusted_filename = false)
+    def initialize(file)
       self.file = file      
-      # Move a file to a location where its filename won't wreak havoc 
-      # if called in a shell command (like mogrify)
-      unless trusted_filename
-        self.move_to File.join(File.dirname(path), filename)
-      end
     end
 
     # Returns the filename, sanitized to strip out any evil characters.
