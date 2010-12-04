@@ -205,6 +205,8 @@ module Pilot
           File.expand_path(@file)
         elsif @file.respond_to?(:path) and not @file.path.blank?
           File.expand_path(@file.path)
+        elsif @file.is_a? ActionDispatch::Http::UploadedFile
+          @file.tempfile.path
         end
       end
     end   
