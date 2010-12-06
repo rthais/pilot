@@ -29,6 +29,7 @@ module Pilot
       end
       
       alias_method :to_s, :url
+      alias_method :as_json, :url
       
       class << self
                                   
