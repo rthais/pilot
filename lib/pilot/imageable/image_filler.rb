@@ -19,6 +19,10 @@ module Pilot
         true
       end
       
+      def destroy
+        self
+      end
+      
       def method_missing(method, *args, &blk)
         if @versions.include? method 
           version_name = "#{method}.#{@name}"
