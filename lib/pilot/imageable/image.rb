@@ -6,7 +6,7 @@ module Pilot
         base.extend ClassMethods
         base.send :include, InstanceMethods        
         base.class_inheritable_hash :versions              
-        base.versions = Hash.new        
+        base.versions = {}.with_indifferent_access
         base.belongs_to :imageable, :polymorphic => true
         base.after_create :create_versions!
       end   
@@ -45,14 +45,22 @@ module Pilot
         def create_versions!
           version_names = imageable.class.try "#{self.class.name.underscore}_versions"
           return unless version_names.present?
-          version_names.each do |v|        
-            key = "#{v}_#{self.name}"
-            filename =  "#{v}_#{_temp_file.filename}"
-            file = _temp_file.clone
-            process file, &versions[v]
-            Storage.store! versions_path, key, file
-          end
+          version_names.each { |v| create_version!(v) }
         end 
+        
+        def create_version!(version, &processor)   
+          processor ||= versions[version]
+          key = "#{version}_#{self.name}"
+          filename =  "#{version}_#{_temp_file.filename}"
+          file = _temp_file.clone
+          process file, &processor
+          Storage.store! versions_path, key, file
+        end
+        
+        def recreate_version!(version, &processor)   
+          self._temp_file = self.storage.read_to_file
+          create_version! version, &processor     
+        end
 
         def recreate_versions!
           self._temp_file = self.storage.read_to_file
