@@ -15,6 +15,12 @@ module Pilot
         self.class.url(@name)
       end
       
+      alias_method :to_s, :url
+      
+      def as_json(*args)
+        url
+      end
+      
       def filler?
         true
       end
@@ -31,10 +37,7 @@ module Pilot
           super
         end
       end
-      
-      alias_method :to_s, :url
-      alias_method :as_json, :url
-      
+            
       class << self
                                   
         def fill(imageable, image_class, association_name, filler_class = nil)
