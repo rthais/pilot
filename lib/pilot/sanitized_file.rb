@@ -36,7 +36,7 @@ module Pilot
     attr_accessor :file
     
     def self.ensure_sanitized(file)
-      return file if file.is_a? self.class
+      return file if file.is_a? self
       self.new file
     end
     
