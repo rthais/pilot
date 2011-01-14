@@ -52,7 +52,8 @@ module Pilot
           processor ||= versions[version]
           key = "#{version}_#{self.name}"
           filename =  "#{version}_#{_temp_file.filename}"
-          file = _temp_file.clone
+          file = _temp_file.dup
+          debugger
           process file, &processor
           Storage.store! versions_path, key, file
         end

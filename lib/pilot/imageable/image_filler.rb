@@ -87,7 +87,7 @@ module Pilot
             Storage.store! remote_path, file.filename, file
             image_class.versions.each do |version, processor|              
               temp_filename = "#{version}.#{file.filename}"
-              temp_file = file.clone
+              temp_file = file.dup
               Processor.process temp_file, &processor
               Storage.store! remote_path, temp_filename, temp_file              
             end

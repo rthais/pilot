@@ -33,7 +33,9 @@ module Pilot
   #
   class SanitizedFile
     
-    attr_accessor :file
+    attr_reader :file
+    attr_reader :content_type
+    attr_reader :original_filename
     
     def self.ensure_sanitized(file)
       return file if file.is_a? self
@@ -212,22 +214,6 @@ module Pilot
     end   
     
     ##
-    # Returns the filename as is, without sanizting it.
-    #
-    # === Returns
-    #
-    # [String] the unsanitized filename
-    #
-    def original_filename
-      return @original_filename if @original_filename
-      if @file and @file.respond_to?(:original_filename)
-        @file.original_filename
-      elsif path
-        File.basename(path)
-      end
-    end
-
-    ##
     # Creates a copy of this file and moves it to the given path. Returns the copy.
     #
     # === Parameters
@@ -254,10 +240,11 @@ module Pilot
     end
     
     
-    def clone
-      self.class.tempfile do |file|
-        file.write self.read
-      end
+    def dup
+      super.tap do |dup|
+        file = self.class.tempfile { |f| f.write self.read }.file
+        dup.instance_eval { @file = file }
+      end      
     end
 
     ##
@@ -265,18 +252,6 @@ module Pilot
     #
     def delete
       FileUtils.rm(path) if exists?
-    end
-
-    ##
-    # Returns the content type of the file.
-    #
-    # === Returns
-    #
-    # [String] the content type of the file
-    #
-    def content_type
-      return @content_type if @content_type
-      @file.content_type.chomp if @file.respond_to?(:content_type) and @file.content_type
     end
     
 
@@ -288,11 +263,26 @@ module Pilot
         @original_filename = file["filename"] || file[:filename]
         @content_type = file["content_type"] || file[:content_type]
       else
-        @file = file
-        @original_filename = nil
-        @content_type = nil
+        @file = file          
+        set_content_type 
+        set_original_filename
       end
     end
+    
+    def set_content_type
+      if @file.respond_to?(:content_type) && @file.content_type.present?
+        @content_type = @file.content_type
+      end
+    end
+    
+    def set_original_filename
+      if @file.respond_to?(:original_filename) && @file.original_filename.present?
+        @original_filename = @file.original_filename
+      elsif path
+        @original_filename = File.basename(path)
+      end
+    end
+      
 
     # create the directory if it doesn't exist
     def mkdir!(path)
