@@ -20,7 +20,7 @@ module Pilot
   @@access_policy = 'public-read'
   
   mattr_accessor :headers
-  @@headers = { 'Cache-Control' => 'public,max-age=86400000' }
+  @@headers = { }
     
   mattr_accessor :image_fillers_original_path
   @@image_fillers_original_path = nil
