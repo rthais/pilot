@@ -40,9 +40,9 @@ module Pilot
       end
 
       def upload
+        self.name = "#{SecureRandom.hex(8)}-#{self._temp_file.filename}"
         _run_upload_callbacks do
           begin
-            self.name = "#{SecureRandom.hex(8)}-#{self._temp_file.filename}"
             self.storage.store!
             self.url = self.storage.url
           rescue => e
