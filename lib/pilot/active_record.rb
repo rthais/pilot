@@ -46,6 +46,7 @@ module Pilot
             self.storage.store!
             self.url = self.storage.url
           rescue => e
+            warn e.inspect
             errors[:base] << "could not upload the file"
             false
           end
