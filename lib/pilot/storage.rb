@@ -53,7 +53,8 @@ module Pilot
     end
     
     def self.connection
-      @connection ||= Fog::AWS::Storage.new(
+      @connection ||= Fog::Storage.new(
+        :provider => 'AWS',
         :aws_access_key_id => Pilot.key,
         :aws_secret_access_key => Pilot.secret
       )

@@ -27,7 +27,11 @@ module Pilot
     module InstanceMethods     
     
       def storage
-        @storage ||= Storage.new(path, name, _temp_file)        
+        if @storage.present? && @storage.name == name
+          @storage 
+        else
+          Storage.new(path, name, _temp_file)        
+        end
       end
 
       # Make sure we always get a SanitizedFile back
@@ -35,7 +39,7 @@ module Pilot
       # passed object intact if it's already a SanitizedFile
       def _temp_file
         if @_temp_file.present?      
-          @_temp_file = SanitizedFile.ensure_sanitized @_temp_file
+          @_temp_file = SanitizedFile.ensure_sanitized(@_temp_file)
         end
       end
 
