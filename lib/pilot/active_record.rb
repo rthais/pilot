@@ -30,7 +30,7 @@ module Pilot
         if @storage.present? && @storage.name == name
           @storage 
         else
-          Storage.new(path, name, _temp_file)        
+          @storage ||= Storage.new(path, name, _temp_file)        
         end
       end
 
