@@ -52,16 +52,12 @@ module Pilot
       new(*args).read
     end
     
-    def self.connection
+    def connection
       @connection ||= Fog::Storage.new(
         :provider => 'AWS',
         :aws_access_key_id => Pilot.key,
         :aws_secret_access_key => Pilot.secret
       )
-    end
-    
-    def connection
-      self.class.connection
     end
 
     def read
